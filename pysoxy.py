@@ -69,7 +69,13 @@ def error(msg="", err=None):
     """ Print exception stack trace python """
     if msg:
         traceback.print_exc()
-        print("{} - Code: {}, Message: {}".format(msg, str(err[0]), err[1]))
+        if isinstance(err, tuple) and len(err) >= 2:
+            print("{} - Code: {}, Message: {}".format(msg, str(err[0]), err[1]))
+        elif err is not None:
+            # For standard exceptions, use str(err) for the message
+            print("{} - Error: {}".format(msg, str(err)))
+        else:
+            print(msg)
     else:
         traceback.print_exc()
 
@@ -168,6 +174,7 @@ def request(wrapper):
     # +----+-----+-------+------+----------+----------+
     rep = b'\x07'
     bnd = b'\x00' + b'\x00' + b'\x00' + b'\x00' + b'\x00' + b'\x00'
+    socket_dst = 0
     if dst:
         socket_dst = connect_to_dst(dst[0], dst[1])
     if not dst or socket_dst == 0:
